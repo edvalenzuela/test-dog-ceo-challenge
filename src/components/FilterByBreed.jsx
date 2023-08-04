@@ -1,47 +1,37 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { DogContext } from "../context/DogContext";
+import { useFetch } from "../hooks/useFetch";
 
-import { Breeds } from "./Breeds";
+import { Breeds } from "./";
+import { Loading } from "../shared";
 
-export const FilterByBreed = ({
-  data,
-  isLoading,
-  hasError,
-  selectBreed,
-  setSelectBreed,
-}) => {
-  const [imgByBreed, setImgByBreed] = useState(null);
-  const [isLoadingBreeds, setisLoadingBreeds] = useState(true);
+export const FilterByBreed = ({ selectBreed, setSelectBreed }) => {
+  const { data, isLoading, hasError } = useContext(DogContext);
 
-  const getApiByBreed = async () => {
-    setisLoadingBreeds(true);
-    try {
-      const resp = await fetch(
-        `https://dog.ceo/api/breed/${selectBreed}/images`
-      );
-      const data = await resp.json();
-      setisLoadingBreeds(false);
-      setImgByBreed(data.message);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { data: dataBreed, 
+      isLoading: isLoadingBreeds, 
+      hasError: hasErrorBreed } = useFetch(`https://dog.ceo/api/breed/${selectBreed}/images`);
 
-  useEffect(() => {
-    getApiByBreed();
-  }, [selectBreed]);
-
-  const handleBreedChange = ({ target }) => {
-    setSelectBreed(target.value);
-    setImgByBreed(null);
-  };
+  const handleBreedChange = ({ target }) => setSelectBreed(target.value);
 
   if (isLoading) return <p>Loading...</p>;
-
   if (hasError) return <p>Error fetching data...</p>;
+  if (hasErrorBreed) return <p>Error fetching breed images...</p>;
+
+  const renderBreedsImages = () => {
+    if(isLoadingBreeds) return <Loading message="Cargando ..." />
+    if(Array.isArray(dataBreed?.message)) {
+      return (<Breeds 
+          imgByBreed={dataBreed.message} 
+          selectBreed={selectBreed} 
+      />);
+    }
+    return <Loading message="Debe seleccionar una raza" />
+  }
 
   return (
     <>
-      <select value={selectBreed} onChange={handleBreedChange}>
+      <select value={selectBreed} onChange={handleBreedChange} className="flex w-1/2 mx-auto my-4 p-4 border-gray-500 border-solid border-2 rounded-md">
         <option value="">Seleccione una raza</option>
         {Object.keys(data?.message).map((breed, i) => (
           <option key={i} value={breed}>
@@ -49,12 +39,7 @@ export const FilterByBreed = ({
           </option>
         ))}
       </select>
-      
-      {isLoadingBreeds ? (
-        <p>Loading ...</p>
-      ) : (
-        <Breeds imgByBreed={imgByBreed} selectBreed={selectBreed} />
-      )}
+      { renderBreedsImages() }
     </>
   );
 };

@@ -1,24 +1,20 @@
-import { useContext, useState } from "react";
-import { DogContext } from "../context/DogContext";
-import { FilterByBreed } from "../components/FilterByBreed";
-import { FilterBySubBreed } from "../components/FilterBySubBreed";
+import { useState } from "react";
+import { FilterByBreed, FilterBySubBreed } from "../components";
 
 export const HomePage = () => {
-  const { data, isLoading, hasError } = useContext(DogContext);
-
-  const dataApi = { data, isLoading, hasError };
-
   const [selectBreed, setSelectBreed] = useState("");
+  const [selectSubBreed, setSelectSubBreed] = useState("");
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto px-4">
       <FilterByBreed
-        {...dataApi}
         selectBreed={selectBreed}
         setSelectBreed={setSelectBreed}
       />
-
-      <FilterBySubBreed {...dataApi} />
+      <FilterBySubBreed 
+        selectSubBreed={selectSubBreed}
+        setSelectSubBreed={setSelectSubBreed}
+      />
     </div>
   );
 };

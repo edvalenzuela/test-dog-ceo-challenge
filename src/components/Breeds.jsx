@@ -1,12 +1,8 @@
-import { CardBreeds } from "./CardBreeds";
+import { CardBreeds } from "./";
 
 export const Breeds = ({ imgByBreed, selectBreed }) => {
-  if (selectBreed.length === 0) {
-    return <p>Debe seleccionar una raza para continuar</p>;
-  }
-
   return (
-    <ul>
+    <ul className="flex flex-wrap mb-24">
       {imgByBreed &&
         imgByBreed.map((url, i) => (
           <CardBreeds
